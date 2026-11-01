@@ -1,0 +1,21 @@
+# 构建产物
+out/
+out-*/
+logs/
+dist/
+*.img
+*.zip
+
+# 内核源码（按 README 自行准备）
+kernel/
+SukiSU-Ultra/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# 系统垃圾
+.DS_Store
+__pycache__/
+*.pyc
