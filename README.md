@@ -48,6 +48,23 @@ Redmi K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142
 
 ## 快速开始
 
+> **本仓库已包含完整编译所需的源码**（`kernel/` + `SukiSU-Ultra/`），两个补丁**均已应用**。
+> 只有想从零复现补丁流程时，才需要执行下面的 1、2 步。
+
+### 最简：clone 后直接编译
+
+```bash
+export CLANG_DIR=/path/to/clang-r522817
+export KBT_DIR=/path/to/kernel-build-tools
+
+# 使用仓库内置配置（已含 KSU + SuSFS 全部开关）
+./scripts/build_variant.sh warsaw --clean --localver -android15-8-warsaw-4k
+```
+
+产物：`out-warsaw/arch/arm64/boot/Image`
+
+配置文件：`configs/warsaw_6.6.142_defconfig`
+
 ### 0. 依赖
 
 | 需要 | 获取方式 |

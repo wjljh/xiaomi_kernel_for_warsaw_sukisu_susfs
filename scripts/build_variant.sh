@@ -30,6 +30,7 @@ export PATH=$CLANG_DIR/bin:$KBT_DIR/bin:$PATH
 NAME=""
 BASEDIR=""
 LOCALVER=""
+CONFIG_FILE=""
 CLEAN=0
 OPTFILE=$(mktemp)
 : > "$OPTFILE"
@@ -40,13 +41,14 @@ while [ $# -gt 0 ]; do
     --enable)   echo "--enable $2"  >> "$OPTFILE"; shift 2 ;;
     --disable)  echo "--disable $2" >> "$OPTFILE"; shift 2 ;;
     --localver) LOCALVER="$2"; shift 2 ;;
+    --config)   CONFIG_FILE="$2"; shift 2 ;;
     --clean)    CLEAN=1; shift ;;
     *)          NAME="$1"; shift ;;
   esac
 done
 
 if [ -z "$NAME" ]; then
-  echo "用法: $0 <变体名> [--base <目录>] [--enable SYM]... [--disable SYM]... [--localver <str>] [--clean]"
+  echo "用法: $0 <变体名> [--base <目录>] [--enable SYM]... [--disable SYM]... [--localver <str>] [--config <文件>] [--clean]"
   rm -f "$OPTFILE"
   exit 1
 fi
@@ -61,11 +63,13 @@ cd "$KERNEL_SRC" || { echo "错误: 找不到内核源码 $KERNEL_SRC"; exit 1; 
 if [ "$CLEAN" = "1" ]; then
   echo ">>> clean 构建（不使用已有产物）" | tee -a "$LOG"
   rm -rf "$OUT"; mkdir -p "$OUT"
-  DEFCONFIG=$KERNEL_SRC/arch/arm64/configs/gki_defconfig
+  DEFCONFIG=${CONFIG_FILE:-$REPO_ROOT/configs/warsaw_6.6.142_defconfig}
+  [ -f "$DEFCONFIG" ] || DEFCONFIG=$KERNEL_SRC/arch/arm64/configs/gki_defconfig
   if [ -f "$DEFCONFIG" ]; then
+    echo ">>> 基础配置: $DEFCONFIG" | tee -a "$LOG"
     cp "$DEFCONFIG" "$OUT/.config"
   else
-    echo "错误: 找不到 gki_defconfig，--clean 需要一个基础 .config"
+    echo "错误: 找不到配置文件，请用 --config 指定"
     rm -f "$OPTFILE"; exit 1
   fi
 elif [ -n "$BASEDIR" ] && [ -d "$OUT_ROOT/$BASEDIR" ]; then
