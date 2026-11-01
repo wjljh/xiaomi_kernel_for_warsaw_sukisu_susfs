@@ -3,12 +3,6 @@ out/
 out-*/
 logs/
 dist/
-*.img
-*.zip
-
-# 内核源码（按 README 自行准备）
-kernel/
-SukiSU-Ultra/
 
 # 编辑器
 .vscode/
