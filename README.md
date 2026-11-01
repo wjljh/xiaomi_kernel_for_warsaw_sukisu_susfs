@@ -65,15 +65,40 @@ export KBT_DIR=/path/to/kernel-build-tools
 
 配置文件：`configs/warsaw_6.6.142_defconfig`
 
-### 0. 依赖
+### 0. 环境要求
+
+#### 主机
+
+| 项目 | 要求 |
+|---|---|
+| 系统 | Linux x86_64（实测 Debian/Ubuntu） |
+| 磁盘 | **≥ 15 GB**（源码检出 1.8 GB + 构建产物 2.6 GB + 余量） |
+| 内存 | ≥ 8 GB；`-j$(nproc)` 并行编译建议 16 GB |
+| Python | 3.8+（`pack_boot.py` 依赖） |
+| 基础工具 | `git`、`patch`、`zip`、`unzip`、`curl`、`make`、`bash` |
+
+#### 工具链（**版本必须匹配**）
+
+| 工具 | 说明 |
+|---|---|
+| **clang-r522817** | Android 15 对应的 LLVM 工具链。版本不匹配会导致 `LTO_CLANG_THIN` / `CFI_CLANG` 链接失败 |
+| **kernel-build-tools** | 需提供 **pahole 1.25**，`DEBUG_INFO_BTF=y` 必需；缺失会报 `BTF: .tmp_vmlinux.btf: pahole not found` |
+| LLVM binutils | `ld.lld` / `llvm-ar` / `llvm-objcopy`，clang 工具链自带 |
+
+```bash
+export CLANG_DIR=/path/to/clang-r522817
+export KBT_DIR=/path/to/kernel-build-tools
+export PATH=$CLANG_DIR/bin:$KBT_DIR/bin:$PATH
+```
+
+#### 源码（本仓库已附带，仅从零复现时需要）
 
 | 需要 | 获取方式 |
 |---|---|
 | 内核源码 | AOSP GKI `android15-6.6`，checkout 到 **6.6.142** |
 | SukiSU Ultra | `git clone https://github.com/SukiSU-Ultra/SukiSU-Ultra`，checkout **v4.3.0** |
 | SuSFS 内核补丁 | [susfs4ksu](https://github.com/Simonpunk/susfs4ksu) 的 `kernel_patches/50_add_susfs_in_gki-android15-6.6.patch` |
-| 工具链 | clang-r522817 + kernel-build-tools |
-| 原厂 boot.img | **需自行从设备 dump**（见下文），用于打包 |
+| 原厂 boot.img | **需自行从设备 dump**（见下文），仅打包阶段需要 |
 
 ### 1. 内核侧：应用 SuSFS 补丁
 
@@ -101,6 +126,25 @@ export BOOT_TEMPLATE=/path/to/stock_boot.img   # 可选，用于自动打包
 
 ./scripts/build_variant.sh mytest --localver -android15-8-mytest-4k
 ```
+
+**耗时实测**（16 线程）：clean build **358 秒**；仅改配置开关的增量 build **约 110 秒**。
+
+成功时输出形如：
+
+```
+>>> clean 构建（不使用已有产物）
+>>> 基础配置: .../configs/warsaw_6.6.142_defconfig
+>>> 生效配置:
+CONFIG_KSU=y
+CONFIG_KSU_DEBUG=y
+# CONFIG_KPM is not set
+CONFIG_LOCALVERSION="-android15-8-mytest-4k"
+>>> MAKE_EXIT=0  耗时 358 秒
+-rwxrwxr-x ... out-mytest/arch/arm64/boot/Image
+>>> 内核版本: Linux version 6.6.142-android15-8-mytest-4k
+```
+
+产物：`out-mytest/arch/arm64/boot/Image`（约 38 MB）。
 
 ### 4. 打包 boot.img
 
