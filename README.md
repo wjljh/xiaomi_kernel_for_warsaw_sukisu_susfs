@@ -1,6 +1,6 @@
 # xiaomi_kernel_for_warsaw_sukisu_susfs
 
-Redmi K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142 + SukiSU Ultra + SuSFS**，附带可复现的构建脚本与 boot.img 打包工具。
+REDMI K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142 + SukiSU Ultra + SuSFS**，附带可复现的构建脚本与 boot.img 打包工具。
 
 ## 特性
 
@@ -15,8 +15,8 @@ Redmi K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142
 
 | 组件 | 版本 / 说明 |
 |---|---|
-| 设备 | Redmi K90 Ultra（`warsaw`，型号 M332BF） |
-| 系统 | HyperOS 4.0.15 |
+| 设备 | REDMI K90 Ultra（`warsaw`，型号 M332BF） |
+| 系统 | HyperOS 4.0.15.0.beta 及 HyperOS 4.0 正式版 |
 | 内核源码 | AOSP GKI `android15-6.6` @ 6.6.142 |
 | SukiSU Ultra | `v4.3.0`（commit `e67b14e6`，KSU 41100） |
 | SuSFS | `v2.3.0`（kernelsu 侧移植：14 文件 / +459 −12） |
@@ -39,7 +39,7 @@ Redmi K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142
 ├── docs/
 │   ├── K90U_4.0.15_TEE深度排查报告.md
 │   ├── 内核编译CPU功耗与效率实测报告.md
-│   └── Redmi_K90_Ultra_Kernel_SukiSU_总结.md
+│   └── REDMI_K90_Ultra_Kernel_SukiSU_总结.md
 ├── ak3/
 │   └── README.md                        # AnyKernel3 模板改动说明
 ├── LICENSE
