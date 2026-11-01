@@ -29,26 +29,36 @@ REDMI K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142
 
 ```
 .
+├── arch/ block/ crypto/ drivers/ fs/ include/ init/ ipc/ kernel/
+├── lib/ mm/ net/ security/ sound/ usr/ virt/
+├── scripts/ tools/ Documentation/          # 内核自带的工具与文档
+├── Makefile  Kbuild  Kconfig  COPYING  CREDITS  MAINTAINERS
+├── build.config.*                          # Android GKI 构建配置
+├── drivers/kernelsu/                       # SukiSU 内核模块（已集成）
+├── configs/warsaw_6.6.142_defconfig        # 本项目实际使用的内核配置
 ├── patches/
-│   ├── susfs-for-sukisu-v4.3.0.patch   # 核心产出：SuSFS → SukiSU 移植
-│   └── README.md                        # 补丁说明与已知边界
-├── scripts/
-│   ├── build_variant.sh                 # 一条命令：配置 + 增量编译 + 打包
-│   ├── pack_boot.py                     # boot.img v4 重打包（AVB 感知）
-│   └── verify_susfs.sh                  # 编译产物验收
+│   ├── susfs-for-sukisu-v4.3.0.patch       # 核心产出：SuSFS → SukiSU 移植
+│   └── README.md                           # 补丁说明与已知边界
+├── project/                                # 本项目工具（区别于内核自带 scripts/）
+│   ├── build_variant.sh                    # 一条命令：配置 + 增量编译 + 打包
+│   ├── pack_boot.py                        # boot.img v4 重打包（AVB 感知）
+│   └── verify_susfs.sh                     # 编译产物验收
 ├── docs/
 │   ├── K90U_4.0.15_TEE深度排查报告.md
 │   ├── 内核编译CPU功耗与效率实测报告.md
 │   └── REDMI_K90_Ultra_Kernel_SukiSU_总结.md
-├── ak3/
-│   └── README.md                        # AnyKernel3 模板改动说明
+├── ak3/README.md                           # AnyKernel3 模板改动说明
+├── SukiSU-Ultra/                           # 用户态（ksud + manager）
+├── README.kernel.md                        # 上游内核自带 README（改名保留）
 ├── LICENSE
 └── README.md
 ```
 
+> **内核源码直接在仓库根目录**，clone 后可直接 `make`，与常见内核仓库布局一致。
+
 ## 快速开始
 
-> **本仓库已包含完整编译所需的源码**（`kernel/` + `SukiSU-Ultra/`），两个补丁**均已应用**。
+> **本仓库已包含完整编译所需的源码**（内核源码 + `SukiSU-Ultra/`），两个补丁**均已应用**。
 > 只有想从零复现补丁流程时，才需要执行下面的 1、2 步。
 
 ### 最简：clone 后直接编译
@@ -58,7 +68,7 @@ export CLANG_DIR=/path/to/clang-r522817
 export KBT_DIR=/path/to/kernel-build-tools
 
 # 使用仓库内置配置（已含 KSU + SuSFS 全部开关）
-./scripts/build_variant.sh warsaw --clean --localver -android15-8-warsaw-4k
+./project/build_variant.sh warsaw --clean --localver -android15-8-warsaw-4k
 ```
 
 产物：`out-warsaw/arch/arm64/boot/Image`
@@ -114,7 +124,7 @@ cd SukiSU-Ultra
 patch -p1 < ../patches/susfs-for-sukisu-v4.3.0.patch
 
 # 在内核源码里挂软链接
-ln -sfn ../../SukiSU-Ultra/kernel kernel/drivers/kernelsu
+ln -sfn ../../SukiSU-Ultra/kernel drivers/kernelsu
 ```
 
 ### 3. 编译
@@ -124,7 +134,7 @@ export CLANG_DIR=/path/to/clang-r522817
 export KBT_DIR=/path/to/kernel-build-tools
 export BOOT_TEMPLATE=/path/to/stock_boot.img   # 可选，用于自动打包
 
-./scripts/build_variant.sh mytest --localver -android15-8-mytest-4k
+./project/build_variant.sh mytest --localver -android15-8-mytest-4k
 ```
 
 **耗时实测**（16 线程）：clean build **358 秒**；仅改配置开关的增量 build **约 110 秒**。
@@ -149,7 +159,7 @@ CONFIG_LOCALVERSION="-android15-8-mytest-4k"
 ### 4. 打包 boot.img
 
 ```bash
-python3 scripts/pack_boot.py pack stock_boot.img \
+python3 project/pack_boot.py pack stock_boot.img \
     out-mytest/arch/arm64/boot/Image \
     boot_warsaw_mytest.img
 ```

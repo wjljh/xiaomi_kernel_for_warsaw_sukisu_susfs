@@ -8,7 +8,7 @@
 # 需要的环境变量:
 #   CLANG_DIR    clang 工具链根目录（例如 .../clang-r522817）
 #   KBT_DIR      kernel-build-tools 根目录（提供 pahole）
-#   KERNEL_SRC   内核源码目录，默认 <仓库根>/kernel
+#   KERNEL_SRC   内核源码目录，默认 <仓库根>（内核源码在根目录）
 #   BOOT_TEMPLATE 可选，原厂 boot.img；设置后自动打包
 #
 # 增量原理: 从 --base 指定的已完成构建目录复制一份，只重编受配置影响的文件。
@@ -18,7 +18,7 @@ set -u
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 REPO_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 
-KERNEL_SRC=${KERNEL_SRC:-$REPO_ROOT/kernel}
+KERNEL_SRC=${KERNEL_SRC:-$REPO_ROOT}
 OUT_ROOT=${OUT_ROOT:-$REPO_ROOT/out}
 LOG_ROOT=${LOG_ROOT:-$REPO_ROOT/logs}
 DIST_DIR=${DIST_DIR:-$REPO_ROOT/dist}
