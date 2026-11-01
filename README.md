@@ -23,8 +23,6 @@ REDMI K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142
 | 工具链 | clang-r522817 + kernel-build-tools（pahole 1.25） |
 | boot.img | header v4，header_size 1584，ramdisk_size 0，内核位于偏移 4096，总大小 **100663296** 字节 |
 
-> **版本强绑定**：KSU 版本号 = `40000 + LOCAL_COUNT − 2815`，必须与管理器 APK 的 versionCode 完全一致，否则管理器会显示「未安装」。本仓库补丁把 `LOCAL_COUNT` 固定为 **3915**（→ 41100），对应官方 `SukiSU_v4.3.0_41100-release.apk`。
-
 ## 仓库结构
 
 ```
