@@ -61,13 +61,21 @@ REDMI K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142
 > **本仓库已包含完整编译所需的源码**（内核源码 + `SukiSU-Ultra/`），两个补丁**均已应用**。
 > 只有想从零复现补丁流程时，才需要执行下面的 1、2 步。
 
-### 最简：clone 后直接编译
+### 最简：完整 clone 后直接编译
+
+> ⚠️ 请使用**完整 clone**，不要加 `--depth 1`。
+> 浅克隆拿不到 git tag，内核的 `scripts/setlocalversion` 会在版本号末尾追加 `+`（例如 `...-4k+`）。
 
 ```bash
+# 1. 完整克隆（约 250 MB，已包含完整内核源码）
+git clone https://github.com/wjljh/xiaomi_kernel_for_warsaw_sukisu_susfs.git
+cd xiaomi_kernel_for_warsaw_sukisu_susfs
+
+# 2. 准备工具链
 export CLANG_DIR=/path/to/clang-r522817
 export KBT_DIR=/path/to/kernel-build-tools
 
-# 使用仓库内置配置（已含 KSU + SuSFS 全部开关）
+# 3. 编译（使用仓库内置配置，已含 KSU + SuSFS 全部开关）
 ./project/build_variant.sh warsaw --clean --localver -android15-8-warsaw-4k
 ```
 
