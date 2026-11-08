@@ -42,6 +42,7 @@ REDMI K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142
 │   ├── pack_boot.py                        # boot.img v4 重打包（AVB 感知）
 │   └── verify_susfs.sh                     # 编译产物验收
 ├── docs/
+│   ├── KPM.md                              # KPM 集成与排查（KP 注入实测）
 │   ├── K90U_4.0.15_TEE深度排查报告.md
 │   ├── 内核编译CPU功耗与效率实测报告.md
 │   └── REDMI_K90_Ultra_Kernel_SukiSU_总结.md
@@ -216,19 +217,41 @@ adb pull /sdcard/stock_boot.img
 
 ## 已知问题
 
-### 1. KPM 需要 KernelPatch
+### 1. KPM 需要 KernelPatch 注入（已验证可用）
 
 v4.3.0 起，KPM 不再是内置加载器，而是 **KernelPatch 的薄桥接**：
 
 ```c
-/* Both built-in and LKM modes use the same KernelPatch kernel-only bridge. */
 fn = find_kernel_symbol_exact("__arm64_sys_truncate");
 if (fn(&regs) != SUKISU_KPM_ABI_VERSION) return -EOPNOTSUPP;
 ```
 
-**只开 `CONFIG_KPM=y` 不够**，还需要 [SukiSU_KernelPatch_patch](https://github.com/ShirkNeko/SukiSU_KernelPatch_patch)。
+**只开 `CONFIG_KPM=y` 不够**，还必须把 KernelPatch 的 payload（`kpimg`）注入内核镜像：
 
-症状：管理器显示「KPM 不支持」，`ksud kpm list` 返回 `os error 95 (EOPNOTSUPP)`。
+```bash
+# 1) 内核开启 CONFIG_KPM=y，编译出裸 Image
+# 2) 用官方 kptools 注入（注意：喂裸 Image，不是 boot.img）
+kptools -p -i out-xxx/arch/arm64/boot/Image -k kpimg -o Image-kp
+kptools -l -i Image-kp        # 期望 patched=true、[kpimg] version=0xe00
+
+# 3) 重新打包 boot
+python3 project/pack_boot.py pack <stock_boot.img> Image-kp boot_kp.img
+```
+
+**工具来源**：[SukiSU_patch](https://github.com/SukiSU-Ultra/SukiSU_patch) 仓库的 `kpm/` 目录（官方预编译 `kpimg` 294,384 字节 + `kptools-linux`）。
+
+⚠️ **不要自己编译 kpimg**，也不要用 180,160 字节的旧版（2026-03 之前）—— 两者都会导致无法开机。
+
+注入后验证：
+
+```bash
+su -c '/data/adb/ksud extension check kpm'   # supported
+su -c '/data/adb/ksud extension get kpm'     # Value: 1
+```
+
+完整流程、失败案例与已知限制见 [docs/KPM.md](docs/KPM.md)。
+
+未注入时的症状：管理器显示「KPM 不支持」，`ksud kpm list` 返回 `os error 95 (EOPNOTSUPP)`。
 
 ### 2. TEE 与 KPM 的历史问题
 
