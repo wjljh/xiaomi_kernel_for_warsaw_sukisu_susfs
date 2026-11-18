@@ -82,6 +82,20 @@ export KBT_DIR=/path/to/kernel-build-tools
 
 配置文件：`configs/warsaw_6.6.142_defconfig`
 
+**构建 KPM 版本**（启用 `CONFIG_KPM=y`）：
+
+```bash
+# 方式一：用内置的 KPM 配置
+./project/build_variant.sh warsaw-kpm --clean \
+    --config configs/warsaw_6.6.142_kpm_defconfig \
+    --localver -android15-8-warsaw-kpm-4k
+
+# 方式二：在标准配置上叠加开关
+./project/build_variant.sh warsaw-kpm --base out-warsaw --enable KPM
+```
+
+> KPM 还必须在编译后把 KernelPatch 的 `kpimg` 注入裸 Image 才能真正使用，见 [docs/KPM.md](docs/KPM.md)。
+
 ### 0. 环境要求
 
 #### 主机
