@@ -2,6 +2,16 @@
 
 REDMI K90 Ultra（代号 **warsaw**）自编译内核项目：**AOSP GKI 6.6.142 + SukiSU Ultra + SuSFS**，附带可复现的构建脚本与 boot.img 打包工具。
 
+> ## 📦 最新版本 v1.0
+>
+> **6.6.142-android15-8-wjljh-2026y11m20d-nova-kpm-4k** —— AOSP GKI 6.6.142 + **SukiSU Nova v3.0.0 (35048)** + **SuSFS v2.4.0** + **KernelPatch e00**
+>
+> - KPM 可用（KP 已注入，模块开机自动加载）
+> - 详见 [docs/RELEASE_v1.0.md](docs/RELEASE_v1.0.md)
+> - SuSFS 2.4.0 移植材料见 [patches/susfs-nova-2.4.0/](patches/susfs-nova-2.4.0/)
+>
+> 下方的 v4.3.0 / SuSFS 2.3.0 内容仍然有效，可作为回滚或对照。
+
 ## 特性
 
 - **内核**：AOSP GKI `android15-6.6` @ Linux 6.6.142，保留 GKI 的 LTO_CLANG_THIN / CFI_CLANG / DEBUG_INFO_BTF
